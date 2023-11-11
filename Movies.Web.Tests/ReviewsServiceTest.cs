@@ -15,10 +15,12 @@ using System.Timers;
 
 namespace Movies.Web.Tests
 {
+    [TestClass]
     public class ReviewsServiceTest
     {
-        private Mock<HttpMessageHandler> CreateHttpMock(HttpStatusCode expectedCode,
-                                                        string expectedJson)
+        private static
+        Mock<HttpMessageHandler> CreateHttpMock(HttpStatusCode expectedCode,
+                                                string? expectedJson)
         {
             var response = new HttpResponseMessage
             {
@@ -41,7 +43,7 @@ namespace Movies.Web.Tests
             return mock;
         }
 
-        private IReviewsService CreateReviewsService(HttpClient client)
+        private static IReviewsService CreateReviewsService(HttpClient client)
         {
             var mockConfiguration = new Mock<IConfiguration>(MockBehavior.Strict);
             mockConfiguration.Setup(c => c["WebServices:Reviews:BaseURL"])
@@ -49,7 +51,7 @@ namespace Movies.Web.Tests
             return new ReviewsService(client, mockConfiguration.Object);
         }
 
-        [Fact]
+        [TestMethod]
         public async Task GetReviewAsync_WithValid_ShouldOkEntity()
         {
             // Arrange
@@ -64,8 +66,8 @@ namespace Movies.Web.Tests
             var result = await service.GetReviewAsync(1);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(expectedResult.Id, result.Id);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedResult.Id, result.Id);
             // FIXME: could assert other result property values
             mock.Protected()
                 .Verify("SendAsync",
@@ -77,7 +79,7 @@ namespace Movies.Web.Tests
                         );
         }
 
-        [Fact]
+        [TestMethod]
         public async Task GetReviewAsync_WithInvalid_ShouldReturnNull()
         {
             // Arrange
@@ -90,7 +92,7 @@ namespace Movies.Web.Tests
             var result = await service.GetReviewAsync(100);
 
             // Assert
-            Assert.Null(result);
+            Assert.IsNull(result);
             mock.Protected()
                 .Verify("SendAsync",
                         Times.Once(),
@@ -101,7 +103,7 @@ namespace Movies.Web.Tests
                         );
         }
 
-        [Fact]
+        [TestMethod]
         public async Task GetReviewAsync_OnHttpBad_ShouldThrow()
         {
             // Arrange
@@ -111,21 +113,21 @@ namespace Movies.Web.Tests
             var service = CreateReviewsService(client);
 
             // Act & Assert
-            await Assert.ThrowsAsync<HttpRequestException>(
+            await Assert.ThrowsExceptionAsync<HttpRequestException>(
                 () => service.GetReviewAsync(1));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task GetReviewsAsync_WithNull_ShouldReturnAll()
         {
             // Arrange
             var expectedResult = new ReviewDto[]
             {
-                new ReviewDto { Id = 1, AuthorId = "larry", AuthorName = "Larry von Larryington", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Trek", Summary = "Loved it", Text = "Really enjoyed this movie.  Proper good and that.", Rating = 4 },
-                new ReviewDto { Id = 2, AuthorId = "beehive", AuthorName = "Betty Lively", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Trek", Summary = "Entertaining but not worth buying", Text = "Didn't feel like the Star Trek I know and love, but it was still entertaining.  Be warned, there's a bit of an obsession with lens flare!", Rating = 3 },
-                new ReviewDto { Id = 3, AuthorId = "beehive", AuthorName = "Betty Lively", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Wars: The Force Awakens", Summary = "Please sir, I'd like some more", Text = "Sooo excited to see Star Wars back.  Feels like the Star Wars I grew up with, although perhaps a bit too repetitive from the originals.  Just needs more saber battles!", Rating = 5 },
-                new ReviewDto { Id = 4, AuthorId = "larry", AuthorName = "Larry von Larryington", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Santa Claus Conquers the Martians", Summary = "WTF!?", Text = "What the actual chuffing missery did I just watch!", Rating = 1 },
-                new ReviewDto { Id = 5, AuthorId = "bob69", AuthorName = "Robert Bob Robertson", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Trek", Summary = "wheres mr data???", Text = null, Rating = 2 }
+                new() { Id = 1, AuthorId = "larry", AuthorName = "Larry von Larryington", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Trek", Summary = "Loved it", Text = "Really enjoyed this movie.  Proper good and that.", Rating = 4 },
+                new() { Id = 2, AuthorId = "beehive", AuthorName = "Betty Lively", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Trek", Summary = "Entertaining but not worth buying", Text = "Didn't feel like the Star Trek I know and love, but it was still entertaining.  Be warned, there's a bit of an obsession with lens flare!", Rating = 3 },
+                new() { Id = 3, AuthorId = "beehive", AuthorName = "Betty Lively", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Wars: The Force Awakens", Summary = "Please sir, I'd like some more", Text = "Sooo excited to see Star Wars back.  Feels like the Star Wars I grew up with, although perhaps a bit too repetitive from the originals.  Just needs more saber battles!", Rating = 5 },
+                new() { Id = 4, AuthorId = "larry", AuthorName = "Larry von Larryington", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Santa Claus Conquers the Martians", Summary = "WTF!?", Text = "What the actual chuffing missery did I just watch!", Rating = 1 },
+                new() { Id = 5, AuthorId = "bob69", AuthorName = "Robert Bob Robertson", CategoryId = "MOV", CategoryTitle = "Movie", Subject = "Star Trek", Summary = "wheres mr data???", Text = "", Rating = 2 }
 
             };
             var expectedJson = JsonConvert.SerializeObject(expectedResult);
@@ -138,11 +140,11 @@ namespace Movies.Web.Tests
             var result = (await service.GetReviewsAsync(null)).ToArray();
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(expectedResult.Length, result.Length);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedResult.Length, result.Length);
             for (int i = 0; i < result.Length; i++)
             {
-                Assert.Equal(expectedResult[i].Id, result[i].Id);
+                Assert.AreEqual(expectedResult[i].Id, result[i].Id);
                 // FIXME: could assert other result property values
             }
             mock.Protected()
@@ -155,20 +157,20 @@ namespace Movies.Web.Tests
                         );
         }
 
-        [Fact]
-        public async Task GetReviewsAsync_WithValid_ShouldReturnList()
+        [TestMethod]
+        public Task GetReviewsAsync_WithValid_ShouldReturnList()
         {
             throw new NotImplementedException();
         }
 
-        [Fact]
-        public async Task GetReviewsAsync_WithInvalid_ShouldReturnEmpty()
+        [TestMethod]
+        public Task GetReviewsAsync_WithInvalid_ShouldReturnEmpty()
         {
             throw new NotImplementedException();
         }
 
-        [Fact]
-        public async Task GetReviewsAsync_OnHttpBad_ShouldThrow()
+        [TestMethod]
+        public Task GetReviewsAsync_OnHttpBad_ShouldThrow()
         {
             throw new NotImplementedException();
         }
