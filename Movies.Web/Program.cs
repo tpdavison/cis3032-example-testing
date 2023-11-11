@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.AddTransient<IReviewsService, FakeReviewsService>();
+    builder.Services.AddTransient<IReviewsService, ReviewsServiceFake>();
 }
 else
 {

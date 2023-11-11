@@ -27,7 +27,7 @@ public class ReviewsController : Controller
             return BadRequest(ModelState);
         }
 
-        IEnumerable<ReviewDto> reviews = null;
+        IEnumerable<ReviewDto> reviews = Array.Empty<ReviewDto>();
         try
         {
             reviews = await _reviewsService.GetReviewsAsync(subject);
@@ -35,7 +35,6 @@ public class ReviewsController : Controller
         catch
         {
             _logger.LogWarning("Exception occurred using Reviews service.");
-            reviews = Array.Empty<ReviewDto>();
         }
         return View(reviews.ToList());
     }

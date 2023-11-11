@@ -17,7 +17,7 @@ public class ReviewsService : IReviewsService
         _client = client;
     }
 
-    public async Task<ReviewDto> GetReviewAsync(int id)
+    public async Task<ReviewDto?> GetReviewAsync(int id)
     {
         var response = await _client.GetAsync("api/reviews/" + id);
         if (response.StatusCode == HttpStatusCode.NotFound)
@@ -29,10 +29,10 @@ public class ReviewsService : IReviewsService
         return review;
     }
 
-    public async Task<IEnumerable<ReviewDto>> GetReviewsAsync(string subject)
+    public async Task<IEnumerable<ReviewDto>> GetReviewsAsync(string? subject)
     {
         var uri = "api/reviews?category=MOV";
-        if (subject != null)
+        if (!String.IsNullOrEmpty(subject))
         {
             uri = uri + "&subject=" + subject;
         }
